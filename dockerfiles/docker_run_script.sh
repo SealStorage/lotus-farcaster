@@ -4,10 +4,10 @@
 while true; do
     BEG=$(date +%s)
     echo $(date +"%a %d %H:%M:%S" --date="@$BEG") Start exporting
-    if /usr/local/bin/lotus-exporter-farcaster.py > /data/farcaster.prom.$$
-    then 
+    if /usr/local/bin/lotus-exporter-farcaster.py  --farcaster-config-folder=/etc/farcaster > /data/farcaster.prom.$$
+    then
         mv /data/farcaster.prom.$$ /data/farcaster.prom
-    else 
+    else
         rm /data/farcaster.prom.$$
     fi
     END=$(date +%s)
