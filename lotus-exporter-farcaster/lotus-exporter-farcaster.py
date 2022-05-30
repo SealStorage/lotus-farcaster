@@ -1098,9 +1098,20 @@ def collect(daemon, miner, markets, metrics, addresses_config):
     # RETRIEVE MAIN ADDRESSES
     daemon_stats = daemon.get("StateMinerInfo", [miner_id, daemon.tipset_key()])
     miner_owner = daemon_stats["result"]["Owner"]
-    miner_owner_addr = daemon.get("StateAccountKey", [miner_owner, daemon.tipset_key()])["result"]
+
+    try:
+        miner_owner_addr = daemon.get("StateAccountKey", [miner_owner, daemon.tipset_key()])["result"]
+    except Exception:
+        # if it failed set address to whatever we have
+        miner_owner_addr = miner_owner
+
     miner_worker = daemon_stats["result"]["Worker"]
-    miner_worker_addr = daemon.get("StateAccountKey", [miner_worker, daemon.tipset_key()])["result"]
+
+    try:
+        miner_worker_addr = daemon.get("StateAccountKey", [miner_worker, daemon.tipset_key()])["result"]
+    except Exception:
+        # if it failed set address to whatever we have
+        miner_worker_addr = miner_worker
 
     # Add miner addresses to known_addresses lookup table
     daemon.add_known_addresses({miner_owner: "Local Owner", miner_owner_addr: "Local Owner", miner_worker: "Local Worker", miner_worker_addr: "Local Worker"})
@@ -1113,7 +1124,11 @@ def collect(daemon, miner, markets, metrics, addresses_config):
         # Add miner addresses to known_addresses lookup table
         daemon.add_known_addresses({miner_control0: "Local control0"})
 
-    miner_control0_addr = daemon.get("StateAccountKey", [miner_control0, daemon.tipset_key()])["result"]
+    try:
+        miner_control0_addr = daemon.get("StateAccountKey", [miner_control0, daemon.tipset_key()])["result"]
+    except Exception:
+        # if it failed set address to whatever we have
+        miner_control0_addr = miner_control0
 
     metrics.add("miner_info", value=1, miner_id=miner_id, version=miner_version["result"]["Version"], owner=miner_owner, owner_addr=miner_owner_addr, worker=miner_worker, worker_addr=miner_worker_addr, control0=miner_control0, control0_addr=miner_control0_addr)
     metrics.add("miner_info_sector_size", value=daemon_stats["result"]["SectorSize"], miner_id=miner_id)
