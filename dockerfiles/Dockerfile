@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.9.16
 
 # Allow environment variables to be passed as build time arguments
 ARG FREQUENCY=50
@@ -42,7 +42,7 @@ RUN ln -sv /usr/local/bin/python3.9 /usr/bin/python3
 
 
 # Add the lib of python
-RUN python3 -m pip install aiohttp toml py-multibase
+RUN python3 -m pip install aiohttp toml py-multibase gql
 
 # Run the container on an unprivileged user XXX not implemented yet // need rights to store files to prometheus folder
 #RUN useradd -r -u 424242 -U farcaster
