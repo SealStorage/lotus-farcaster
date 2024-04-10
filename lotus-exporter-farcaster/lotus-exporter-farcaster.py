@@ -833,13 +833,15 @@ class Markets(Lotus):
         """ create one structure with all the info related to storage and retreival market """
         res = {}
 
+        # TODO-JVZ - These api calls were removed from lotus/boost.
+        #   Probably need to use the boost rpc call to get this info now or find an alternative way? 
         res["storage"] = self.get("MarketGetAsk", [])["result"]["Ask"]
-        res["storage"]["ConsiderOnlineDeals"] = self.get("DealsConsiderOnlineStorageDeals", [])["result"]
-        res["storage"]["ConsiderOfflineDeals"] = self.get("DealsConsiderOfflineStorageDeals", [])["result"]
+        res["storage"]["ConsiderOnlineDeals"] = False   # self.get("DealsConsiderOnlineStorageDeals", [])["result"]
+        res["storage"]["ConsiderOfflineDeals"] = False  # self.get("DealsConsiderOfflineStorageDeals", [])["result"]
 
-        res["retrieval"] = self.get("MarketGetRetrievalAsk", [])["result"]
-        res["retrieval"]["ConsiderOnlineDeals"] = self.get("DealsConsiderOnlineRetrievalDeals", [])["result"]
-        res["retrieval"]["ConsiderOfflineDeals"] = self.get("DealsConsiderOfflineRetrievalDeals", [])["result"]
+        # res["retrieval"] = self.get("MarketGetRetrievalAsk", [])["result"]
+        # res["retrieval"]["ConsiderOnlineDeals"] = self.get("DealsConsiderOnlineRetrievalDeals", [])["result"]
+        # res["retrieval"]["ConsiderOfflineDeals"] = self.get("DealsConsiderOfflineRetrievalDeals", [])["result"]
 
         return res
 
@@ -1172,10 +1174,10 @@ def collect(daemon, miner, markets, metrics, addresses_config):
         logging.error(f'MinerGetBaseInfo returned no result')
         logging.info(f'KNOWN_REASON your miner needs to have a power >0 for Farcaster to work. Its linked to a Lotus API bug)')
         logging.info(f'SOLUTION restart your miner and node')
-        metrics.add("scrape_execution_succeed", value=0)
-        sys.exit(0)
+        # metrics.add("scrape_execution_succeed", value=0)
+        # sys.exit(0)
 
-    if base_info["result"]["EligibleForMining"]:
+    if base_info["result"] is not None and base_info["result"]["EligibleForMining"]:
         eligibility = 1
     else:
         eligibility = 0
@@ -1494,12 +1496,16 @@ def collect(daemon, miner, markets, metrics, addresses_config):
     market_info = markets.get_market_info_enhanced()
     metrics.add("miner_market_info", value=1,
                 miner_id=miner_id,
-                retrieval_consider_online_deals=market_info["retrieval"]["ConsiderOnlineDeals"],
-                retrieval_consider_offline_deals=market_info["retrieval"]["ConsiderOfflineDeals"],
-                retrieval_price_per_byte=market_info["retrieval"]["PricePerByte"],
-                retrieval_unseal_price=market_info["retrieval"]["UnsealPrice"],
-                storage_consider_online_deals=market_info["storage"]["ConsiderOnlineDeals"],
-                storage_consider_offline_deals=market_info["storage"]["ConsiderOfflineDeals"],
+                # retrieval_consider_online_deals=market_info["retrieval"]["ConsiderOnlineDeals"],
+                # retrieval_consider_offline_deals=market_info["retrieval"]["ConsiderOfflineDeals"],
+                # retrieval_price_per_byte=market_info["retrieval"]["PricePerByte"],
+                # retrieval_unseal_price=market_info["retrieval"]["UnsealPrice"],
+                retrieval_consider_online_deals=False,
+                retrieval_consider_offline_deals=False,
+                retrieval_price_per_byte=0,
+                retrieval_unseal_price=0,                
+                storage_consider_online_deals=False,
+                storage_consider_offline_deals=False,
                 storage_expiry=market_info["storage"]["Expiry"],
                 storage_max_piece_size=market_info["storage"]["MaxPieceSize"],
                 storage_min_piece_size=market_info["storage"]["MinPieceSize"],
